@@ -1,0 +1,58 @@
+{
+  "name": "Wordly Bot",
+  "description": "Addictive word-game Telegram bot with $WRD coin economy",
+  "image": "heroku/python",
+  "stack": "container",
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "standard-2x"
+    }
+  },
+  "env": {
+    "BOT_TOKEN": {
+      "description": "Your Telegram Bot Token from @BotFather",
+      "required": true
+    },
+    "OWNER_ID": {
+      "description": "Your Telegram User ID (get from @userinfobot)",
+      "required": true
+    },
+    "MONGO_URI": {
+      "description": "MongoDB Atlas connection URI",
+      "required": true
+    },
+    "DB_NAME": {
+      "description": "MongoDB database name",
+      "value": "wordly_bot"
+    },
+    "WEBHOOK_URL": {
+      "description": "Your Heroku app URL e.g. https://your-app.herokuapp.com",
+      "required": true
+    },
+    "USE_WEBHOOK": {
+      "value": "true"
+    },
+    "BOT_USERNAME": {
+      "description": "Your bot's username without @",
+      "required": true
+    },
+    "SUPPORT_GROUP": {
+      "description": "Telegram group link",
+      "required": false
+    },
+    "SUPPORT_CHANNEL": {
+      "description": "Telegram channel link",
+      "required": false
+    },
+    "ADD_BOT_LINK": {
+      "description": "Link to add bot to groups",
+      "required": false
+    },
+    "WELCOME_IMAGE_URL": {
+      "description": "URL of welcome banner image",
+      "required": false
+    }
+  },
+  "buildpacks": []
+}
