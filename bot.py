@@ -510,7 +510,9 @@ async def cmd_addcoins(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 async def post_init(app: Application):
     await db.connect()
-    log.info("✅ Bot started")
+    # Always delete any existing webhook/polling session to prevent Conflict errors
+    await app.bot.delete_webhook(drop_pending_updates=True)
+    log.info("✅ Webhook cleared, bot started")
 
 
 async def post_shutdown(app: Application):
@@ -553,16 +555,23 @@ def main():
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_word))
 
     if USE_WEBHOOK and WEBHOOK_URL:
-        log.info(f"🌐 Starting webhook on port {PORT}")
+        webhook_path = "/webhook"
+        full_webhook_url = WEBHOOK_URL.rstrip("/") + webhook_path
+        log.info(f"🌐 Starting webhook → {full_webhook_url} on port {PORT}")
         app.run_webhook(
             listen="0.0.0.0",
             port=PORT,
-            webhook_url=WEBHOOK_URL,
+            url_path=webhook_path,
+            webhook_url=full_webhook_url,
+            drop_pending_updates=True,
             allowed_updates=Update.ALL_TYPES,
         )
     else:
         log.info("🔄 Starting polling")
-        app.run_polling(allowed_updates=Update.ALL_TYPES)
+        app.run_polling(
+            drop_pending_updates=True,
+            allowed_updates=Update.ALL_TYPES,
+        )
 
 
 if __name__ == "__main__":
