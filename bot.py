@@ -72,14 +72,20 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         await safe_reply(update, "⛔ You are banned from Wordly Bot.")
         return
     text = start_msg(update.effective_user.first_name)
-    try:
-        await update.message.reply_photo(
-            photo=WELCOME_IMAGE_URL,
-            caption=text,
-            parse_mode=ParseMode.HTML,
-            reply_markup=start_keyboard()
-        )
-    except Exception:
+    sent = False
+    # Only try photo if URL looks valid (not a placeholder)
+    if WELCOME_IMAGE_URL and "your_welcome_image" not in WELCOME_IMAGE_URL and WELCOME_IMAGE_URL.startswith("http"):
+        try:
+            await update.message.reply_photo(
+                photo=WELCOME_IMAGE_URL,
+                caption=text,
+                parse_mode=ParseMode.HTML,
+                reply_markup=start_keyboard()
+            )
+            sent = True
+        except Exception as e:
+            log.warning(f"Photo send failed: {e}")
+    if not sent:
         await safe_reply(update, text, reply_markup=start_keyboard())
 
 
@@ -510,7 +516,6 @@ async def cmd_addcoins(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 async def post_init(app: Application):
     await db.connect()
-    # Always delete any existing webhook/polling session to prevent Conflict errors
     await app.bot.delete_webhook(drop_pending_updates=True)
     log.info("✅ Webhook cleared, bot started")
 
