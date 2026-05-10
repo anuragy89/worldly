@@ -56,49 +56,54 @@ async def get_user(user_id: int) -> dict:
 
 async def upsert_user(user_id: int, username: str, full_name: str) -> dict:
     now = datetime.utcnow()
-    result = await users_col.find_one_and_update(
-        {"user_id": user_id},
-        {
-            "$setOnInsert": {
-                "user_id":    user_id,
-                "username":   username,
-                "full_name":  full_name,
-                "coins":      0,
-                "total_score": 0,
-                "games_played": 0,
-                "words_found": 0,
-                "streak":     0,
-                "max_streak": 0,
-                "last_played": None,
-                "streak_shield": False,
-                "inventory":  {},
-                "rank":       "Beginner",
-                "joined_at":  now,
-                "referred_by": None,
-                "referrals":  0,
-                "personal_best": 0,
-                "title":      None,
-                "theme":      "default",
-                "avatar_frame": None,
-                "last_daily": None,
-                "banned":     False,
-            },
-            "$set": {
+    # Check if user already exists to track new registrations
+    existing = await users_col.find_one({"user_id": user_id})
+    if existing is None:
+        # New user — insert with all defaults
+        doc = {
+            "user_id":      user_id,
+            "username":     username,
+            "full_name":    full_name,
+            "coins":        0,
+            "total_score":  0,
+            "games_played": 0,
+            "words_found":  0,
+            "streak":       0,
+            "max_streak":   0,
+            "last_played":  None,
+            "streak_shield":False,
+            "inventory":    {},
+            "rank":         "Beginner",
+            "joined_at":    now,
+            "referred_by":  None,
+            "referrals":    0,
+            "personal_best":0,
+            "title":        None,
+            "theme":        "default",
+            "avatar_frame": None,
+            "last_daily":   None,
+            "banned":       False,
+            "last_seen":    now,
+        }
+        await users_col.insert_one(doc)
+        await stats_col.update_one(
+            {"_id": "global"},
+            {"$inc": {"total_users": 1}, "$set": {"updated_at": now}},
+            upsert=True
+        )
+        return doc
+    else:
+        # Existing user — only update mutable fields (never overlap with $setOnInsert fields)
+        result = await users_col.find_one_and_update(
+            {"user_id": user_id},
+            {"$set": {
                 "username":  username,
                 "full_name": full_name,
                 "last_seen": now,
-            }
-        },
-        upsert=True,
-        return_document=True
-    )
-    # Track bot growth
-    await stats_col.update_one(
-        {"_id": "global"},
-        {"$inc": {"total_users": 1}, "$set": {"updated_at": now}},
-        upsert=True
-    )
-    return result
+            }},
+            return_document=True
+        )
+        return result
 
 
 async def add_coins(user_id: int, amount: int, reason: str = "") -> int:
