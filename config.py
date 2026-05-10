@@ -21,7 +21,7 @@ ADD_BOT_LINK     = os.getenv("ADD_BOT_LINK", "https://t.me/YourWordlyBot?startgr
 # Drop your welcome image URL here (rendered above start message)
 WELCOME_IMAGE_URL = os.getenv(
     "WELCOME_IMAGE_URL",
-    "https://i.imgur.com/your_welcome_image.jpg"   # ← replace with your image
+    "https://ibb.co/twL7H06z"   # ← replace with your image
 )
 
 # ╔══════════════════════════════════════════════════════════════╗
