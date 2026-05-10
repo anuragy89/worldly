@@ -28,7 +28,7 @@
     },
     "WEBHOOK_URL": {
       "description": "Your Heroku app URL e.g. https://your-app.herokuapp.com",
-      "required": true
+      "required": false
     },
     "USE_WEBHOOK": {
       "value": "true"
