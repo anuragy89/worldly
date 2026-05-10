@@ -16,6 +16,11 @@ wordly_bot/
 
 ---
 
+## 🚀 Quick Deploy to Heroku
+
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/anuragy89/wordly)
+
+
 ## ⚙️ Step 1 — Configure `config.py`
 
 Open `config.py` and fill in:
